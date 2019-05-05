@@ -1,23 +1,26 @@
 <template>
   <div class="options">
-    <checkbox
+    <label
       class="options__checkbox"
       v-for="option in options"
       :key="option"
-      :label="option"
-      :active="isActive(option)"
-      @toggle="onToggle"
-    />
+    >
+      <input
+        type="checkbox"
+        :id="'$_checkbox_' + option"
+        :checked="isActive(option)"
+        :disabled="isActive(option)"
+        @click="$emit('input', option)"
+      />
+      <!-- checkbox css 적용을 위한 label -->
+      <label :for="'$_checkbox_' + option"></label>
+      {{option}}
+    </label>
   </div>
 </template>
 
 <script>
-  import Checkbox from "@/components/Checkbox";
-
   export default {
-    components: {
-      Checkbox
-    },
     props: {
       options: {
         type: Array,
@@ -30,15 +33,6 @@
       }
     },
     methods: {
-      onToggle(label, checked) {
-        let value = "";
-
-        if (checked) {
-          value = label;
-        }
-
-        this.$emit('input', label);
-      },
       isActive(label) {
         return this.value === label;
       }
@@ -47,6 +41,8 @@
 </script>
 
 <style scoped>
+  @import '../asserts/checkbox.css';
+
   .options {
     display: flex;
   }

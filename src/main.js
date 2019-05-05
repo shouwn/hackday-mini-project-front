@@ -4,8 +4,8 @@ import Vue from 'vue'
 import App from './App'
 import axios from 'axios';
 
+axios.defaults.baseURL = "http://localhost:8080";
 Vue.prototype.$http = axios;
-Vue.prototype.baseURI = "http://localhost:8080";
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */

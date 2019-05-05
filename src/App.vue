@@ -17,7 +17,7 @@
     평균 시간: {{average || 0}} ms
     <div class="time">
       <div v-for="time in times">
-        {{time}}
+        {{time}} ms
       </div>
     </div>
   </div>
@@ -29,8 +29,7 @@
 
   import * as _ from "lodash";
 
-  let options = ["startsWith", "contains", "endsWith"];
-  let ignoreRegex = /[\{\}\[\]\/?.,;:|\)*~`!^\-_+┼<>@\#$%&\'\"\\\(\=]/gi;
+  const options = ["startsWith", "contains", "endsWith"];
 
   export default {
     components: {
@@ -49,19 +48,16 @@
     methods: {
       /**
        * 서버에서 자동 완성 요청을 보내는 메소드
-       * 특수문자가 포함되지 않게 제거한 뒤 요청을 보냅니다.
        */
-      search: _.debounce(function () {
-        let keyword = this.keyword.replace(ignoreRegex, "");
-
+      search: _.debounce(function (keyword, option) {
         if (keyword) {
-          let startTime = new Date().getMilliseconds();
+          let startTime = new Date().getTime();
 
-          this.$http.get(`${this.baseURI}/item/title/${this.currentOption}/${keyword}/size/5`)
+          this.$http.get(`/item/title/${option}/${keyword}/size/5`)
             .then(result => {
               this.words = result.data.map(item => item.title);
 
-              this.times.push(new Date().getMilliseconds() - startTime + "ms");
+              this.times.push(new Date().getTime() - startTime);
             })
         } else {
           this.words = [];
@@ -70,19 +66,18 @@
     },
     computed: {
       average() {
-        let times = this.times.slice();
-        let average = times.map(time => parseInt(time.replace("ms", "")))
-          .reduce((sum, cur) => sum + cur, 0) / times.length;
+        let times = [...this.times];
+        let average = times.reduce((sum, cur) => sum + cur, 0) / times.length;
 
         return Math.round(average);
       }
     },
     watch: {
-      currentOption() {
-        this.search();
+      currentOption(newOption) {
+        this.search(this.keyword, newOption);
       },
-      keyword() {
-        this.search();
+      keyword(newKeyword) {
+        this.search(newKeyword, this.currentOption);
       }
     }
   }
